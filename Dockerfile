@@ -4,6 +4,7 @@ RUN apt-get update && apt-get install -y nano vim
 
 WORKDIR /weheproject
 
+ENV DJANGO_SETTINGS_MODULE=weheproject.settings.local
 ENV PYTHONUNBUFFERED 1
 
 COPY Pipfile Pipfile.lock ./
