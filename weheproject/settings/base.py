@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from django.urls import reverse_lazy
 from pathlib import Path
 import os
 import environ
@@ -35,6 +36,11 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -42,6 +48,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # 소셜 로그인
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',  
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',
+
     'drf_yasg',
 ]
 
@@ -111,6 +125,11 @@ USE_I18N = True
 
 USE_TZ = True
 
+# 소셜로그인 관련 설정
+LOGIN_REDIRECT_URL = '/'
+ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+
+SITE_ID = 2
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
