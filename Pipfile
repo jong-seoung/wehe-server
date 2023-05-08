@@ -9,6 +9,8 @@ drf-yasg = "1.21.5"
 psycopg2-binary = "2.9.6"
 djangorestframework = "3.14.0"
 django-environ = "0.10.0"
+django-allauth = "0.54.0"
+djangorestframework-simplejwt = "5.2.2"
 
 [dev-packages]
 django-environ = "0.10.0"
