@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
+
 
     'drf_yasg',
 ]
