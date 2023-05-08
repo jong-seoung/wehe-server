@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'allauth.account',  
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.google',
 
     'drf_yasg',
 ]
@@ -126,7 +127,7 @@ USE_I18N = True
 USE_TZ = True
 
 # 소셜로그인 관련 설정
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 
 SITE_ID = 2
