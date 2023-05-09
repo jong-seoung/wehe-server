@@ -24,6 +24,5 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     container_name: POSTGRES_DB
-
-
-
+    ports:
+      - "5432:5432"
