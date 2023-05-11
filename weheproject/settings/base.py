@@ -58,10 +58,17 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
 
+    'rest_framework',
     'drf_yasg',
     'user',
     'core',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny'
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -132,8 +139,8 @@ USE_I18N = True
 USE_TZ = True
 
 # 소셜로그인 관련 설정
-LOGIN_REDIRECT_URL = "/api/v1/user/login"
-ACCOUNT_LOGOUT_REDIRECT_URL = "/api/v1/user/login/"
+LOGIN_REDIRECT_URL = "/"
+ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_LOGOUT_ON_GET = True
 

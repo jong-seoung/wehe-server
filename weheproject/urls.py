@@ -25,8 +25,9 @@ schema_view = get_schema_view(
       title="weheproject API",
       default_version='v1',
       description="API for weheproject",
-      terms_of_service="https://www.google.com/policies/terms/",
+      terms_of_service="https://github.com/orgs/Team-We-Here/repositories",
    ),
+   validators=['flex'],
    public=True,
    permission_classes=[permissions.AllowAny],
 )
