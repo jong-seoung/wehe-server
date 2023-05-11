@@ -1,7 +1,8 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
+from django.shortcuts import redirect
 from django.db import models
-from core.models import TimestampZone
+from core.models import TimeStampedModel
 from django.utils.translation import gettext_lazy as _
 
 
@@ -9,8 +10,11 @@ class UserManager(BaseUserManager):
     use_in_migrations = True
 
     def _create_user(self, email, password, **extra_fields):
+
         if not email:
-            raise ValueError('이메일을 설정해야 합니다')
+            error_message = '이메일을 설정해야 합니다'
+            return redirect('error_page')
+
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -28,14 +32,17 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
 
         if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
+            error_message = '슈퍼유저 권한을 부여하려면 is_staff 필드가 True여야 합니다.'
+            return redirect('error_page')
+
         if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
+            error_message = '슈퍼유저 권한을 부여하려면 is_superuser 필드가 True여야 합니다.'
+            return redirect('error_page')
 
         return self._create_user(email, password, **extra_fields)
 
 
-class User(TimestampZone, AbstractBaseUser, PermissionsMixin):
+class User(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     name = models.CharField(_('name'), max_length=10, blank=True, null=True)
     nickname = models.CharField(_('nickname'), max_length=20, unique=True)
