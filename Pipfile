@@ -15,6 +15,7 @@ djangorestframework-simplejwt = "5.2.2"
 [dev-packages]
 django-environ = "0.10.0"
 black = "23.3.0"
+faker = "18.7.0"
 
 [requires]
 python_version = "3.9"

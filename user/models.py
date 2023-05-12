@@ -2,6 +2,7 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.shortcuts import redirect
 from django.db import models
+import uuid
 from core.models import TimeStampedModel
 from django.utils.translation import gettext_lazy as _
 
@@ -45,8 +46,8 @@ class UserManager(BaseUserManager):
 class User(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     name = models.CharField(_('name'), max_length=10, blank=True, null=True)
-    nickname = models.CharField(_('nickname'), max_length=20, unique=True)
-    profile_image = models.CharField(_('profile image'), max_length=255, blank=True, null=True)
+    nickname = models.CharField(_('nickname'), max_length=15, unique=True, default=str(uuid.uuid4().fields[-1])[:10])
+    profile_image = models.CharField(_('profile image'), max_length=255, blank=True, default="basic_profile_image")
     birthday = models.DateField(_('birthday'), max_length=10, blank=True, null=True)
     job = models.CharField(_('job'), max_length=30, blank=True, null=True)
     career = models.CharField(_('career'), max_length=4, blank=True, null=True)
