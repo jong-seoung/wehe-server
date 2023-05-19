@@ -43,12 +43,22 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
+class Job(models.Model):
+    name = models.CharField(_('job'), max_length=30, blank=True, null=True)
+
+
+class Skill(models.Model):
+    name = models.CharField(_('skill'), max_length=30, blank=True, null=True)
+    image_url = models.CharField(_('skill image'), max_length=255, blank=True)
+
+
 class User(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     name = models.CharField(_('name'), max_length=10, blank=True, null=True)
     nickname = models.CharField(_('nickname'), max_length=15, unique=True, default=str(uuid.uuid4().fields[-1])[:10])
     birthday = models.DateField(_('birthday'), max_length=10, blank=True, null=True)
-    job = models.CharField(_('job'), max_length=30, blank=True, null=True)
+    jobs = models.ManyToManyField(Job)
+    skills = models.ManyToManyField(Skill)
     career = models.CharField(_('career'), max_length=4, blank=True, null=True)
     is_staff = models.BooleanField(_('staff status'), default=False, help_text=_('Designates whether the user can log '
                                                                                  'into this admin site.'),)
