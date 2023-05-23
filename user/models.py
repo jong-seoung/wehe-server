@@ -52,6 +52,11 @@ class Skill(models.Model):
     image_url = models.CharField(_('skill image'), max_length=255, blank=True)
 
 
+class UserImage(TimeStampedModel, models.Model):
+    file_size = models.BigIntegerField()
+    image_url = models.CharField(_('profile image'), max_length=255, blank=True, default="basic_profile_image")
+
+
 class User(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     name = models.CharField(_('name'), max_length=10, blank=True, null=True)
@@ -60,6 +65,7 @@ class User(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     jobs = models.ManyToManyField(Job)
     skills = models.ManyToManyField(Skill)
     career = models.CharField(_('career'), max_length=4, blank=True, null=True)
+    user_image = models.OneToOneField(UserImage, on_delete=models.CASCADE, related_name='user')
     is_staff = models.BooleanField(_('staff status'), default=False, help_text=_('Designates whether the user can log '
                                                                                  'into this admin site.'),)
 
@@ -73,9 +79,3 @@ class User(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
         verbose_name = _('user')
         verbose_name_plural = _('users')
         swappable = 'AUTH_USER_MODEL'
-
-
-class UserImage(TimeStampedModel, models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    file_size = models.BigIntegerField()
-    image_url = models.CharField(_('profile image'), max_length=255, blank=True, default="basic_profile_image")
