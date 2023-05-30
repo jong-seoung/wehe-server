@@ -64,7 +64,6 @@ class User(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     birthday = models.DateField(_('birthday'), max_length=10, blank=True, null=True)
     jobs = models.ManyToManyField(Job)
     skills = models.ManyToManyField(Skill)
-    career = models.CharField(_('career'), max_length=4, blank=True, null=True)
     user_image = models.OneToOneField(UserImage, on_delete=models.CASCADE, related_name='user')
     is_staff = models.BooleanField(_('staff status'), default=False, help_text=_('Designates whether the user can log '
                                                                                  'into this admin site.'),)
