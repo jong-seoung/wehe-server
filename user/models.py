@@ -49,12 +49,12 @@ class Job(models.Model):
 
 class Skill(models.Model):
     name = models.CharField(_('skill'), max_length=30, blank=True, null=True)
-    image_url = models.CharField(_('skill image'), max_length=255, blank=True)
+    image = models.ImageField(_('skill image'), upload_to='skill_images/', blank=True)
 
 
 class UserImage(TimeStampedModel, models.Model):
-    file_size = models.BigIntegerField()
-    image_url = models.CharField(_('profile image'), max_length=255, blank=True, default="basic_profile_image")
+    file_size = models.BigIntegerField(blank=True, null=True)
+    image = models.ImageField(_('profile image'), upload_to='profile_images/', blank=True, default="basic_profile_image")
 
 
 class User(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
@@ -72,6 +72,13 @@ class User(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            user_image = UserImage.objects.create()
+            self.user_image = user_image
+
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = "user"
