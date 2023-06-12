@@ -123,6 +123,7 @@ WSGI_APPLICATION = 'weheproject.wsgi.application'
 REST_USE_JWT = True
 
 SIMPLE_JWT = {
+    'JWT_SECRET_KEY': SECRET_KEY,
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': False,
@@ -135,6 +136,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
 

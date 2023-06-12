@@ -13,6 +13,20 @@ from django.shortcuts import redirect
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import AllowAny
 from user.models import User
+from user.serializer import JWTTokenSerializer
+from rest_framework.response import Response
+
+
+class GenerateJWTTokenView(APIView):
+    def post(self, request):
+        user = request.user
+        serializer = JWTTokenSerializer()
+        tokens = serializer.generate_tokens(user)
+
+        access_token = tokens['access_token']
+        refresh_token = tokens['refresh_token']
+
+        return Response({'access_token': access_token, 'refresh_token': refresh_token})
 
 
 class Constants:
@@ -154,13 +168,16 @@ class KakaoCallbackView(APIView):
         profile_json = profile_request.json()
         kakao_account = profile_json.get('kakao_account')
         email = kakao_account.get('email')
+        user = User.objects.get(email=email)
+        social_user = SocialAccount.objects.get(user=user)
         try:
-            user = User.objects.get(email=email)
-            social_user = SocialAccount.objects.get(user=user)
             if social_user is None:
                 return JsonResponse({'err_msg': 'email exists but not social user'}, status=status.HTTP_400_BAD_REQUEST)
             if social_user.provider != 'kakao':
                 return JsonResponse({'err_msg': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
+            jwt_token_view = GenerateJWTTokenView()
+            jwt_token = jwt_token_view.post(request).data['access_token']
+            request.session['jwt_token'] = jwt_token
             data = {'access_token': access_token, 'code': code, 'id_token': id_token}
             accept = requests.post(
                 f"{BASE_URL}api/v1/user/kakao/login/finish/", data=data)
@@ -177,6 +194,9 @@ class KakaoCallbackView(APIView):
             accept_status = accept.status_code
             if accept_status != 200:
                 return JsonResponse({'err_msg': 'failed to signup'}, status=accept_status)
+            jwt_token_view = GenerateJWTTokenView()
+            jwt_token = jwt_token_view.post(request).data['access_token']
+            request.session['jwt_token'] = jwt_token
             accept_json = accept.json()
             accept_json.pop('user', None)
             return redirect(settings.LOGIN_REDIRECT_URL)
@@ -221,8 +241,6 @@ class GithubCallbackView(APIView):
                 return redirect(f"{BASE_URL}api/v1/user/google/login")
             return JsonResponse(token_req_json)
         access_token = token_req_json.get('access_token')
-        request.session['access_token'] = access_token
-
         user_req = requests.get(f"https://api.github.com/user",
                                 headers={"Authorization": f"Bearer {access_token}"})
         user_json = user_req.json()
@@ -230,13 +248,16 @@ class GithubCallbackView(APIView):
         if error is not None:
             return redirect(f"{BASE_URL}api/v1/user/google/login")
         email = user_json.get("email")
+        user = User.objects.get(email=email)
+        social_user = SocialAccount.objects.get(user=user)
         try:
-            user = User.objects.get(email=email)
-            social_user = SocialAccount.objects.get(user=user)
             if social_user is None:
                 return JsonResponse({'err_msg': 'email exists but not social user'}, status=status.HTTP_400_BAD_REQUEST)
             if social_user.provider != 'github':
                 return JsonResponse({'err_msg': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
+            jwt_token_view = GenerateJWTTokenView()
+            jwt_token = jwt_token_view.post(request).data['access_token']
+            request.session['jwt_token'] = jwt_token
             data = {'access_token': access_token, 'code': code}
             accept = requests.post(
                 f"{BASE_URL}api/v1/user/github/login/finish/", data=data)
@@ -253,6 +274,9 @@ class GithubCallbackView(APIView):
             accept_status = accept.status_code
             if accept_status != 200:
                 return JsonResponse({'err_msg': 'failed to signup'}, status=accept_status)
+            jwt_token_view = GenerateJWTTokenView()
+            jwt_token = jwt_token_view.post(request).data['access_token']
+            request.session['jwt_token'] = jwt_token
             accept_json = accept.json()
             accept_json.pop('user', None)
             return redirect(settings.LOGIN_REDIRECT_URL)
