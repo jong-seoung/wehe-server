@@ -1,19 +1,21 @@
+from django.shortcuts import redirect
+from django.http import JsonResponse
+from django.conf import settings
+from django.contrib.sessions.backends.db import SessionStore
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from allauth.socialaccount.models import SocialAccount
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google import views as google_view
 from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.providers.github import views as github_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from rest_framework.views import APIView
-from django.http import JsonResponse
-from django.conf import settings
-import requests
-from rest_framework import status
-from django.shortcuts import redirect
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework.permissions import AllowAny
+import requests
 from user.models import User
-from user.tokens import MyTokenObtainPairSerializer
+from .serializers import LogoutSerializer
 
 
 class Constants:
@@ -163,6 +165,7 @@ class KakaoCallbackView(APIView):
         REST_API_KEY = Constants.REST_API_KEY
         KAKAO_CALLBACK_URI = Constants.KAKAO_CALLBACK_URI
         code = request.GET.get("code")
+        session = SessionStore()
         """
             Access Token Request
         """
@@ -185,9 +188,9 @@ class KakaoCallbackView(APIView):
         kakao_account = profile_json.get("kakao_account")
         print(kakao_account)
         email = kakao_account.get("email")
-        user = User.objects.get(email=email)
-        social_user = SocialAccount.objects.get(user=user)
         try:
+            user = User.objects.get(email=email)
+            social_user = SocialAccount.objects.get(user=user)
             if social_user is None:
                 return JsonResponse(
                     {"err_msg": "email exists but not social user"},
@@ -208,9 +211,14 @@ class KakaoCallbackView(APIView):
                     {"err_msg": "failed to signin"}, status=accept_status
                 )
             accept_json = accept.json()
-            access_token, refresh_token = MyTokenObtainPairSerializer().get_token(user)
-            print("Access Token:", access_token)
-            print("Refresh Token:", refresh_token)
+            token = TokenObtainPairSerializer.get_token(user)
+            access_token = str(token.access_token)
+            refresh_token = str(token)
+            session["access_token"] = access_token
+            session.save()
+            print(refresh_token)
+            print(access_token)
+            print(session["access_token"])
             accept_json.pop("user", None)
             return JsonResponse(accept_json)
         except User.DoesNotExist:
@@ -224,9 +232,11 @@ class KakaoCallbackView(APIView):
                     {"err_msg": "failed to signup"}, status=accept_status
                 )
             accept_json = accept.json()
-            access_token, refresh_token = MyTokenObtainPairSerializer().get_token(user)
-            print("Access Token:", access_token)
-            print("Refresh Token:", refresh_token)
+            user = User.objects.get(email=email)
+            token = TokenObtainPairSerializer.get_token(user)
+            access_token = str(token.access_token)
+            session["access_token"] = access_token
+            session.save()
             accept_json.pop("user", None)
             return JsonResponse(accept_json)
 
@@ -255,6 +265,7 @@ class GithubCallbackView(APIView):
 
     @swagger_auto_schema(operation_id="깃허브 로그인 콜백")
     def get(self, request):
+        session = SessionStore()
         BASE_URL = Constants.BASE_URL
         GITHUB_CLIENT_ID = Constants.GITHUB_CLIENT_ID
         GITHUB_CLIENT_SECRET = Constants.GITHUB_CLIENT_SECRET
@@ -283,9 +294,9 @@ class GithubCallbackView(APIView):
         if error is not None:
             return redirect(f"{BASE_URL}api/v1/user/google/login")
         email = user_json.get("email")
-        user = User.objects.get(email=email)
-        social_user = SocialAccount.objects.get(user=user)
         try:
+            user = User.objects.get(email=email)
+            social_user = SocialAccount.objects.get(user=user)
             if social_user is None:
                 return JsonResponse(
                     {"err_msg": "email exists but not social user"},
@@ -296,9 +307,6 @@ class GithubCallbackView(APIView):
                     {"err_msg": "no matching social type"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            access_token, refresh_token = MyTokenObtainPairSerializer().get_token(user)
-            print("Access Token:", access_token)
-            print("Refresh Token:", refresh_token)
             data = {"access_token": access_token, "code": code}
             accept = requests.post(
                 f"{BASE_URL}api/v1/user/github/login/finish/", data=data
@@ -308,9 +316,13 @@ class GithubCallbackView(APIView):
                 return JsonResponse(
                     {"err_msg": "failed to signin"}, status=accept_status
                 )
+            token = TokenObtainPairSerializer.get_token(user)
+            access_token = str(token.access_token)
+            session["access_token"] = access_token
+            session.save()
             accept_json = accept.json()
             accept_json.pop("user", None)
-            return redirect(settings.LOGIN_REDIRECT_URL)
+            return JsonResponse(accept_json)
         except User.DoesNotExist:
             data = {"access_token": access_token, "code": code}
             accept = requests.post(
@@ -321,17 +333,30 @@ class GithubCallbackView(APIView):
                 return JsonResponse(
                     {"err_msg": "failed to signup"}, status=accept_status
                 )
-            access_token, refresh_token = MyTokenObtainPairSerializer().get_token(user)
-            print("Access Token:", access_token)
-            print("Refresh Token:", refresh_token)
+            user = User.objects.get(email=email)
+            token = TokenObtainPairSerializer.get_token(user)
+            access_token = str(token.access_token)
+            session["access_token"] = access_token
+            session.save()
             accept_json = accept.json()
             accept_json.pop("user", None)
-            return redirect(settings.LOGIN_REDIRECT_URL)
+            return JsonResponse(accept_json)
 
 
 class GithubLoginToDjango(SocialLoginView):
     permission_classes = [AllowAny]
 
     adapter_class = github_view.GitHubOAuth2Adapter
-    callback_url = Constants.GITHUB_CALLBACK_URI
     client_class = OAuth2Client
+    callback_url = Constants.GITHUB_CALLBACK_URI
+
+
+class LogoutAPIView(APIView):
+    serializer_class = LogoutSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return redirect(settings.LOGIN_REDIRECT_URL)
