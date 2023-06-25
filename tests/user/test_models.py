@@ -5,17 +5,16 @@ from user.models import User
 
 # 회원가입시 유저 모델 생성 테스트
 class UserModelTest(TestCase):
-
     def setUp(self):
         self.user = User.objects.create(
-            email='test@test.com',
+            email="test@test.com",
         )
 
     def test_create_user(self):
         user_count = User.objects.count()
         self.assertEquals(user_count, 1)
 
-        self.assertEqual(self.user.email, 'test@test.com')
+        self.assertEqual(self.user.email, "test@test.com")
         self.assertEqual(self.user.name, None)
         self.assertIsNotNone(self.user.nickname)
         self.assertEqual(self.user.birthday, None)
@@ -31,13 +30,12 @@ class UserModelTest(TestCase):
 
 # 최초 로그인 입력값 테스트
 class UserFirstLogin(TestCase):
-
     def setUp(self):
         self.user = User.objects.create(
-            email='test@test.com',
-            name='test',
-            nickname='nick name',
-            birthday='2000-12-11',
+            email="test@test.com",
+            name="test",
+            nickname="nick name",
+            birthday="2000-12-11",
         )
 
     def test_name_label(self):
