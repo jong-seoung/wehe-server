@@ -51,8 +51,8 @@ class GoogleLoginView(APIView):
 
 class GoogleCallbackView(APIView):
     permission_classes = [AllowAny]
+    schema = None
 
-    @swagger_auto_schema(operation_id="구글 로그인 콜백")
     def get(self, request):
         BASE_URL = Constants.BASE_URL
         GOOGLE_CLIENT_ID = Constants.GOOGLE_CLIENT_ID
@@ -141,6 +141,7 @@ class GoogleCallbackView(APIView):
 
 class GoogleLoginToDjango(SocialLoginView):
     adapter_class = google_view.GoogleOAuth2Adapter
+    schema = None
     callback_url = Constants.GOOGLE_CALLBACK_URI
     client_class = OAuth2Client
 
@@ -158,6 +159,7 @@ class KakaoLoginView(APIView):
 
 class KakaoCallbackView(APIView):
     permission_classes = [AllowAny]
+    schema = None
 
     @swagger_auto_schema(operation_id="카카오 로그인 콜백")
     def get(self, request):
@@ -243,6 +245,7 @@ class KakaoCallbackView(APIView):
 
 class KakaoLoginToDjango(SocialLoginView):
     permission_classes = [AllowAny]
+    schema = None
 
     adapter_class = kakao_view.KakaoOAuth2Adapter
     client_class = OAuth2Client
@@ -262,6 +265,7 @@ class GithubLoginView(APIView):
 
 class GithubCallbackView(APIView):
     permission_classes = [AllowAny]
+    schema = None
 
     @swagger_auto_schema(operation_id="깃허브 로그인 콜백")
     def get(self, request):
@@ -345,6 +349,7 @@ class GithubCallbackView(APIView):
 
 class GithubLoginToDjango(SocialLoginView):
     permission_classes = [AllowAny]
+    schema = None
 
     adapter_class = github_view.GitHubOAuth2Adapter
     client_class = OAuth2Client
