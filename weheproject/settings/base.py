@@ -18,9 +18,6 @@ SOCIAL_AUTH_GOOGLE_CLIENT_ID = env("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
 SOCIAL_AUTH_GOOGLE_SECRET = env("SOCIAL_AUTH_GOOGLE_SECRET")
 
 
-DEBUG = True
-
-
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
@@ -35,9 +32,9 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "django.contrib.sites",
-    "allauth.socialaccount",
     "dj_rest_auth",
     "dj_rest_auth.registration",
+    "allauth.socialaccount",
     "allauth.socialaccount.providers.kakao",
     "allauth.socialaccount.providers.google",
     "allauth.socialaccount.providers.github",
@@ -57,7 +54,6 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    # 'django.middleware.csrf.CsrfViewMiddleware',
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -86,7 +82,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "weheproject.wsgi.application"
-
 
 REST_USE_JWT = True
 
