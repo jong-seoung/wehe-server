@@ -1,11 +1,9 @@
 from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.conf import settings
-from django.contrib.sessions.backends.db import SessionStore
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from allauth.socialaccount.models import SocialAccount
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google import views as google_view
@@ -16,6 +14,8 @@ from drf_yasg.utils import swagger_auto_schema
 import requests
 from user.models import User
 from .serializers import LogoutSerializer
+from .serializers import TokenResponseSerializer
+from rest_framework.response import Response
 
 
 class Constants:
@@ -111,10 +111,13 @@ class GoogleCallbackView(APIView):
                 return JsonResponse(
                     {"err_msg": "failed to signin1"}, status=accept_status
                 )
-
-            accept_json = accept.json()
-            accept_json.pop("user", None)
-            return JsonResponse(accept_json)
+            serializer = TokenResponseSerializer(user)
+            data = serializer.to_representation(serializer)
+            res = Response(
+                data,
+                status=status.HTTP_200_OK,
+            )
+            return res
 
         except User.DoesNotExist:
             data = {"app": GOOGLE_CLIENT_ID, "token": access_token, "code": code}
@@ -122,21 +125,17 @@ class GoogleCallbackView(APIView):
                 f"{BASE_URL}api/v1/user/google/login/finish/", data=data
             )
             accept_status = accept.status_code
-
             if accept_status != 200:
                 return JsonResponse(
                     {"err_msg": "failed to signup"}, status=accept_status
                 )
-
-            accept_json = accept.json()
-            accept_json.pop("user", None)
-            return JsonResponse(accept_json)
-
-        except (User.DoesNotExist, SocialAccount.DoesNotExist):
-            return JsonResponse(
-                {"err_msg": "email exists but not social user"},
-                status=status.HTTP_400_BAD_REQUEST,
+            user = User.objects.get(email=email)
+            serializer = TokenResponseSerializer(user)
+            res = Response(
+                serializer.data,
+                status=status.HTTP_200_OK,
             )
+            return res
 
 
 class GoogleLoginToDjango(SocialLoginView):
@@ -167,7 +166,6 @@ class KakaoCallbackView(APIView):
         REST_API_KEY = Constants.REST_API_KEY
         KAKAO_CALLBACK_URI = Constants.KAKAO_CALLBACK_URI
         code = request.GET.get("code")
-        session = SessionStore()
         """
             Access Token Request
         """
@@ -188,7 +186,6 @@ class KakaoCallbackView(APIView):
         )
         profile_json = profile_request.json()
         kakao_account = profile_json.get("kakao_account")
-        print(kakao_account)
         email = kakao_account.get("email")
         try:
             user = User.objects.get(email=email)
@@ -212,17 +209,13 @@ class KakaoCallbackView(APIView):
                 return JsonResponse(
                     {"err_msg": "failed to signin"}, status=accept_status
                 )
-            accept_json = accept.json()
-            token = TokenObtainPairSerializer.get_token(user)
-            access_token = str(token.access_token)
-            refresh_token = str(token)
-            session["access_token"] = access_token
-            session.save()
-            print(refresh_token)
-            print(access_token)
-            print(session["access_token"])
-            accept_json.pop("user", None)
-            return JsonResponse(accept_json)
+            serializer = TokenResponseSerializer(user)
+            data = serializer.to_representation(serializer)
+            res = Response(
+                data,
+                status=status.HTTP_200_OK,
+            )
+            return res
         except User.DoesNotExist:
             data = {"access_token": access_token, "code": code}
             accept = requests.post(
@@ -233,14 +226,14 @@ class KakaoCallbackView(APIView):
                 return JsonResponse(
                     {"err_msg": "failed to signup"}, status=accept_status
                 )
-            accept_json = accept.json()
             user = User.objects.get(email=email)
-            token = TokenObtainPairSerializer.get_token(user)
-            access_token = str(token.access_token)
-            session["access_token"] = access_token
-            session.save()
-            accept_json.pop("user", None)
-            return JsonResponse(accept_json)
+            serializer = TokenResponseSerializer(user)
+            data = serializer.to_representation(serializer)
+            res = Response(
+                data,
+                status=status.HTTP_200_OK,
+            )
+            return res
 
 
 class KakaoLoginToDjango(SocialLoginView):
@@ -269,7 +262,6 @@ class GithubCallbackView(APIView):
 
     @swagger_auto_schema(operation_id="깃허브 로그인 콜백")
     def get(self, request):
-        session = SessionStore()
         BASE_URL = Constants.BASE_URL
         GITHUB_CLIENT_ID = Constants.GITHUB_CLIENT_ID
         GITHUB_CLIENT_SECRET = Constants.GITHUB_CLIENT_SECRET
@@ -320,13 +312,13 @@ class GithubCallbackView(APIView):
                 return JsonResponse(
                     {"err_msg": "failed to signin"}, status=accept_status
                 )
-            token = TokenObtainPairSerializer.get_token(user)
-            access_token = str(token.access_token)
-            session["access_token"] = access_token
-            session.save()
-            accept_json = accept.json()
-            accept_json.pop("user", None)
-            return JsonResponse(accept_json)
+            serializer = TokenResponseSerializer(user)
+            data = serializer.to_representation(serializer)
+            res = Response(
+                data,
+                status=status.HTTP_200_OK,
+            )
+            return res
         except User.DoesNotExist:
             data = {"access_token": access_token, "code": code}
             accept = requests.post(
@@ -338,13 +330,13 @@ class GithubCallbackView(APIView):
                     {"err_msg": "failed to signup"}, status=accept_status
                 )
             user = User.objects.get(email=email)
-            token = TokenObtainPairSerializer.get_token(user)
-            access_token = str(token.access_token)
-            session["access_token"] = access_token
-            session.save()
-            accept_json = accept.json()
-            accept_json.pop("user", None)
-            return JsonResponse(accept_json)
+            serializer = TokenResponseSerializer(user)
+            data = serializer.to_representation(serializer)
+            res = Response(
+                data,
+                status=status.HTTP_200_OK,
+            )
+            return res
 
 
 class GithubLoginToDjango(SocialLoginView):
@@ -362,6 +354,6 @@ class LogoutAPIView(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        message = serializer.save()
 
-        return redirect(settings.LOGIN_REDIRECT_URL)
+        return Response(message)
