@@ -2,7 +2,6 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.shortcuts import redirect
 from django.db import models
-import uuid
 from core.models import TimeStampedModel
 from django.utils.translation import gettext_lazy as _
 
@@ -42,10 +41,6 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-class Job(models.Model):
-    name = models.CharField(_("job"), max_length=30, blank=True, null=True)
-
-
 class Skill(models.Model):
     name = models.CharField(_("skill"), max_length=30, blank=True, null=True)
     image = models.ImageField(_("skill image"), upload_to="skill_images/", blank=True)
@@ -65,13 +60,9 @@ class User(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_("email address"), unique=True)
     name = models.CharField(_("name"), max_length=10, blank=True, null=True)
     nickname = models.CharField(
-        _("nickname"),
-        max_length=15,
-        unique=True,
-        default=str(uuid.uuid4().fields[-1])[:10],
+        _("nickname"), max_length=15, unique=True, blank=True, null=True
     )
     birthday = models.DateField(_("birthday"), max_length=10, blank=True, null=True)
-    jobs = models.ManyToManyField(Job)
     skills = models.ManyToManyField(Skill)
     user_image = models.OneToOneField(
         UserImage, on_delete=models.CASCADE, related_name="user"
