@@ -9,7 +9,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/user/", include("user.urls")),
 
-    path("signup/", include("dj_rest_auth.registration.urls")),
     path("verify-email/", VerifyEmailView.as_view(), name="rest_verify_email"),
     path(
         "account-confirm-email/",
