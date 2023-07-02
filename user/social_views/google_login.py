@@ -10,9 +10,9 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from drf_yasg.utils import swagger_auto_schema
 import requests
 from user.models import User
-from .serializers import TokenResponseSerializer
+from user.serializers import TokenResponseSerializer
 from rest_framework.response import Response
-from .views import Constants
+from user.views import Constants
 
 
 class GoogleLoginView(APIView):
@@ -121,5 +121,4 @@ class GoogleLoginToDjango(SocialLoginView):
     schema = None
     callback_url = Constants.GOOGLE_CALLBACK_URI
     client_class = OAuth2Client
-
 

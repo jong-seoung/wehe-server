@@ -5,61 +5,58 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from allauth.socialaccount.models import SocialAccount
 from dj_rest_auth.registration.views import SocialLoginView
-from allauth.socialaccount.providers.github import views as github_view
+from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from drf_yasg.utils import swagger_auto_schema
 import requests
 from user.models import User
-from .serializers import TokenResponseSerializer
+from user.serializers import TokenResponseSerializer
 from rest_framework.response import Response
-from .views import Constants
+from user.views import Constants
 
 
-class GithubLoginView(APIView):
+class KakaoLoginView(APIView):
     permission_classes = [AllowAny]
 
-    @swagger_auto_schema(operation_id="깃허브 로그인")
+    @swagger_auto_schema(operation_id="카카오 로그인")
     def get(self, request):
         return redirect(
-            f"https://github.com/login/oauth/authorize?client_id={Constants.GITHUB_CLIENT_ID}"
-            f"&redirect_uri={Constants.GITHUB_CALLBACK_URI}"
+            f"https://kauth.kakao.com/oauth/authorize?client_id={Constants.REST_API_KEY}"
+            f"&redirect_uri={Constants.KAKAO_CALLBACK_URI}&response_type=code"
         )
 
 
-class GithubCallbackView(APIView):
+class KakaoCallbackView(APIView):
     permission_classes = [AllowAny]
     schema = None
 
-    @swagger_auto_schema(operation_id="깃허브 로그인 콜백")
+    @swagger_auto_schema(operation_id="카카오 로그인 콜백")
     def get(self, request):
         BASE_URL = Constants.BASE_URL
-        GITHUB_CLIENT_ID = Constants.GITHUB_CLIENT_ID
-        GITHUB_CLIENT_SECRET = Constants.GITHUB_CLIENT_SECRET
-        GITHUB_CALLBACK_URI = Constants.GITHUB_CALLBACK_URI
+        REST_API_KEY = Constants.REST_API_KEY
+        KAKAO_CALLBACK_URI = Constants.KAKAO_CALLBACK_URI
         code = request.GET.get("code")
-
-        token_req = requests.post(
-            f"https://github.com/login/oauth/access_token?client_id={GITHUB_CLIENT_ID}"
-            f"&client_secret={GITHUB_CLIENT_SECRET}&code={code}&accept=&json&redirect_uri={GITHUB_CALLBACK_URI}"
-            f"&response_type=code",
-            headers={"Accept": "application/json"},
+        """
+            Access Token Request
+        """
+        token_req = requests.get(
+            f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={REST_API_KEY}"
+            f"&redirect_uri={KAKAO_CALLBACK_URI}&code={code}"
         )
         token_req_json = token_req.json()
         error = token_req_json.get("error")
         if error is not None:
             if token_req_json.get("error") == "invalid_request":
-                return redirect(f"{BASE_URL}api/v1/user/google/login")
+                return redirect(f"{BASE_URL}api/v1/user/kakao/login")
             return JsonResponse(token_req_json)
         access_token = token_req_json.get("access_token")
-        user_req = requests.get(
-            f"https://api.github.com/user",
+        profile_request = requests.get(
+            "https://kapi.kakao.com/v2/user/me",
             headers={"Authorization": f"Bearer {access_token}"},
         )
-        user_json = user_req.json()
-        error = user_json.get("error")
-        if error is not None:
-            return redirect(f"{BASE_URL}api/v1/user/google/login")
-        email = user_json.get("email")
+        profile_json = profile_request.json()
+        kakao_account = profile_json.get("kakao_account")
+        email = kakao_account.get("email")
         try:
             user = User.objects.get(email=email)
             social_user = SocialAccount.objects.get(user=user)
@@ -68,14 +65,14 @@ class GithubCallbackView(APIView):
                     {"err_msg": "email exists but not social user"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            if social_user.provider != "github":
+            if social_user.provider != "kakao":
                 return JsonResponse(
                     {"err_msg": "no matching social type"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             data = {"access_token": access_token, "code": code}
             accept = requests.post(
-                f"{BASE_URL}api/v1/user/github/login/finish/", data=data
+                f"{BASE_URL}api/v1/user/kakao/login/finish/", data=data
             )
             accept_status = accept.status_code
             if accept_status != 200:
@@ -92,7 +89,7 @@ class GithubCallbackView(APIView):
         except User.DoesNotExist:
             data = {"access_token": access_token, "code": code}
             accept = requests.post(
-                f"{BASE_URL}api/v1/user/github/login/finish/", data=data
+                f"{BASE_URL}api/v1/user/kakao/login/finish/", data=data
             )
             accept_status = accept.status_code
             if accept_status != 200:
@@ -109,10 +106,11 @@ class GithubCallbackView(APIView):
             return res
 
 
-class GithubLoginToDjango(SocialLoginView):
+class KakaoLoginToDjango(SocialLoginView):
     permission_classes = [AllowAny]
     schema = None
 
-    adapter_class = github_view.GitHubOAuth2Adapter
+    adapter_class = kakao_view.KakaoOAuth2Adapter
     client_class = OAuth2Client
-    callback_url = Constants.GITHUB_CALLBACK_URI
+    callback_url = Constants.KAKAO_CALLBACK_URI
+
