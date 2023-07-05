@@ -121,4 +121,3 @@ class GoogleLoginToDjango(SocialLoginView):
     schema = None
     callback_url = Constants.GOOGLE_CALLBACK_URI
     client_class = OAuth2Client
-

@@ -113,4 +113,3 @@ class KakaoLoginToDjango(SocialLoginView):
     adapter_class = kakao_view.KakaoOAuth2Adapter
     client_class = OAuth2Client
     callback_url = Constants.KAKAO_CALLBACK_URI
-
