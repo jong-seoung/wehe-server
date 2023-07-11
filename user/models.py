@@ -3,6 +3,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.shortcuts import redirect
 from django.db import models
 from core.models import TimeStampedModel
+from skills.models import Skill
 from django.utils.translation import gettext_lazy as _
 
 
@@ -39,11 +40,6 @@ class UserManager(BaseUserManager):
             return redirect("error_page")
 
         return self._create_user(email, password, **extra_fields)
-
-
-class Skill(models.Model):
-    name = models.CharField(_("skill"), max_length=30, blank=True, null=True)
-    image = models.ImageField(_("skill image"), upload_to="skill_images/", blank=True)
 
 
 class UserImage(TimeStampedModel, models.Model):

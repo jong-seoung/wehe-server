@@ -10,6 +10,7 @@ class TokenResponseSerializer(serializers.Serializer):
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.token = TokenObtainPairSerializer.get_token(user)
+        self.user = user
 
     def get_access_token(self):
         return str(self.token.access_token)
@@ -18,8 +19,14 @@ class TokenResponseSerializer(serializers.Serializer):
         return str(self.token)
 
     def to_representation(self, instance):
+        nickname = self.user.nickname
+        if nickname is None:
+            message = "first login"
+        else:
+            message = "not first login"
+
         return {
-            "message": "login success",
+            "message": message,
             "token": {
                 "access": self.get_access_token(),
                 "refresh": self.get_refresh_token(),
