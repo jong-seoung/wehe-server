@@ -59,12 +59,8 @@ CORS_ALLOW_HEADERS = [
 ]
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": get_env_variable("DB_NAME"),
-        "USER": get_env_variable("DB_USER"),
-        "PASSWORD": get_env_variable("DB_PASSWORD"),
-        "HOST": get_env_variable("DB_HOST"),
-        "PORT": get_env_variable("DB_PORT"),
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
