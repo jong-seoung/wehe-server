@@ -1,15 +1,17 @@
 from .base import *
 
+
 def get_env_variable(var_name):
-  try:
-    return os.environ[var_name]
-  except KeyError:
-    error_msg = 'Set the {} environment variable'.format(var_name)
-    raise ImproperlyConfigured(error_msg)
+    try:
+        return os.environ[var_name]
+    except KeyError:
+        error_msg = "Set the {} environment variable".format(var_name)
+        raise ImproperlyConfigured(error_msg)
+
 
 ALLOWED_HOSTS = ["*"]
 
-SECRET_KEY = get_env_variable('DJANGO_SECRET')
+SECRET_KEY = get_env_variable("DJANGO_SECRET")
 STATE = get_env_variable("STATE")
 KAKAO_REST_API_KEY = get_env_variable("KAKAO_REST_API_KEY")
 SOCIAL_AUTH_GITHUB_CLIENT_ID = get_env_variable("SOCIAL_AUTH_GITHUB_CLIENT_ID")
@@ -31,8 +33,8 @@ SIMPLE_JWT = {
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_COOKIE_NAME = 'XSRF-TOKEN'
-CSRF_HEADER_NAME = 'X-XSRF-TOKEN'
+CSRF_COOKIE_NAME = "XSRF-TOKEN"
+CSRF_HEADER_NAME = "X-XSRF-TOKEN"
 
 CORS_ALLOW_METHODS = [
     "GET",
@@ -57,11 +59,11 @@ CORS_ALLOW_HEADERS = [
 
 DATABASES = {
     "default": {
-        "ENGINE": 'django.db.backends.postgresql',
-        'NAME': get_env_variable('DB_NAME'),
-        'USER': get_env_variable('DB_USER'),
-        'PASSWORD': get_env_variable('DB_PASSWORD'),
-        'HOST': get_env_variable('DB_HOST'),
-        'PORT': get_env_variable('DB_PORT'),
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": get_env_variable("DB_NAME"),
+        "USER": get_env_variable("DB_USER"),
+        "PASSWORD": get_env_variable("DB_PASSWORD"),
+        "HOST": get_env_variable("DB_HOST"),
+        "PORT": get_env_variable("DB_PORT"),
     }
 }
