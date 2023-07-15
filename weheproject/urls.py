@@ -7,6 +7,7 @@ from weheproject.swagger import get_swagger_urls
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('static/<path:dummy>', serve, {'document_root': settings.STATIC_ROOT}),
     path("api/v1/user/", include("user.urls")),
     path("verify-email/", VerifyEmailView.as_view(), name="rest_verify_email"),
     path(
