@@ -12,8 +12,9 @@ django-environ = "0.10.0"
 django-allauth = "0.54.0"
 djangorestframework-simplejwt = "5.2.2"
 pillow = "9.5.0"
-requests = "2.36.0"
 dj-rest-auth = "4.0.1"
+requests = "2.31.0"
+whitenoise = "6.5.0"
 
 [dev-packages]
 django-environ = "0.10.0"
