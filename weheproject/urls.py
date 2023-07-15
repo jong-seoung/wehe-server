@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 from dj_rest_auth.registration.views import VerifyEmailView
+from django.views.static import serve
 
 from weheproject.swagger import get_swagger_urls
 
