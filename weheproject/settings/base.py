@@ -132,6 +132,6 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 
 SITE_ID = 1
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

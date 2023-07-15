@@ -9,6 +9,7 @@ def get_env_variable(var_name):
         error_msg = "Set the {} environment variable".format(var_name)
         raise ImproperlyConfigured(error_msg)
 
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -20,7 +21,17 @@ SOCIAL_AUTH_GITHUB_SECRET = get_env_variable("SOCIAL_AUTH_GITHUB_SECRET")
 SOCIAL_AUTH_GOOGLE_CLIENT_ID = get_env_variable("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
 SOCIAL_AUTH_GOOGLE_SECRET = get_env_variable("SOCIAL_AUTH_GOOGLE_SECRET")
 
-DEBUG = False
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": get_env_variable("DB_NAME"),
+        "USER": get_env_variable("DB_USER"),
+        "PASSWORD": get_env_variable("DB_PASSWORD"),
+        "HOST": get_env_variable("DB_HOST"),
+        "PORT": get_env_variable("DB_PORT"),
+    }
+}
 
 SIMPLE_JWT = {
     "JWT_SECRET_KEY": SECRET_KEY,
@@ -55,13 +66,5 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": get_env_variable("DB_NAME"),
-        "USER": get_env_variable("DB_USER"),
-        "PASSWORD": get_env_variable("DB_PASSWORD"),
-        "HOST": get_env_variable("DB_HOST"),
-        "PORT": get_env_variable("DB_PORT"),
-    }
-}
+CSRF_TRUSTED_ORIGINS = ["*"]
+
