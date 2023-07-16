@@ -48,7 +48,7 @@ class GithubCallbackView(APIView):
         error = token_req_json.get("error")
         if error is not None:
             if token_req_json.get("error") == "invalid_request":
-                return redirect(f"{BASE_URL}api/v1/user/google/login")
+                return redirect(f"{BASE_URL}api/v1/user/github/login")
             return JsonResponse(token_req_json)
         access_token = token_req_json.get("access_token")
         user_req = requests.get(
@@ -58,7 +58,7 @@ class GithubCallbackView(APIView):
         user_json = user_req.json()
         error = user_json.get("error")
         if error is not None:
-            return redirect(f"{BASE_URL}api/v1/user/google/login")
+            return redirect(f"{BASE_URL}api/v1/user/github/login")
         email = user_json.get("email")
         try:
             user = User.objects.get(email=email)
