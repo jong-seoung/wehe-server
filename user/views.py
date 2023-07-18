@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 
 class Constants:
-    BASE_URL = "http://127.0.0.1:8000/"
+    BASE_URL = "https://port-0-wehe-k19y2kljve3tgo.sel4.cloudtype.app/"
 
     GOOGLE_CALLBACK_URI = f"{BASE_URL}api/v1/user/google/callback/"
     GOOGLE_CLIENT_ID = getattr(settings, "SOCIAL_AUTH_GOOGLE_CLIENT_ID")
