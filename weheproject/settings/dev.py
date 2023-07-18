@@ -9,6 +9,7 @@ def get_env_variable(var_name):
         error_msg = "Set the {} environment variable".format(var_name)
         raise ImproperlyConfigured(error_msg)
 
+
 DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
@@ -35,8 +36,8 @@ DATABASES = {
 
 SIMPLE_JWT = {
     "JWT_SECRET_KEY": SECRET_KEY,
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=2),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,
     "TOKEN_OBTAIN_SERIALIZER": "user.serializers.MyTokenObtainPairSerializer",
@@ -45,6 +46,4 @@ SIMPLE_JWT = {
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = (
-    'https://port-0-wehe-k19y2kljve3tgo.sel4.cloudtype.app',
-)
+CSRF_TRUSTED_ORIGINS = ("https://port-0-wehe-k19y2kljve3tgo.sel4.cloudtype.app",)
