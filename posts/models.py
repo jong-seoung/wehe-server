@@ -3,6 +3,7 @@ from core.models import TimeStampedModel
 from skills.models import Skill
 from user.models import User
 
+
 class Post(TimeStampedModel, models.Model):
     title = models.CharField(max_length=256)
     schedule = models.CharField(max_length=35)
@@ -24,9 +25,10 @@ class Post(TimeStampedModel, models.Model):
             models.Index(fields=["author"]),
         ]
 
+
 class Like(TimeStampedModel, models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('user', 'post')
+        unique_together = ("user", "post")
