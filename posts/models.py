@@ -12,6 +12,7 @@ class Post(TimeStampedModel, models.Model):
     skills = models.ManyToManyField(Skill)
     contact = models.CharField()
     contact_url = models.TextField()
+    views = models.PositiveIntegerField(default=0)
 
     is_private = models.BooleanField()
 

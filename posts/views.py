@@ -26,6 +26,18 @@ class PostDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsOwnerOrReadOnly]
 
+    def retrieve(self, request, *args, **kwargs):
+        pk = self.kwargs.get('pk')
+        post = get_object_or_404(Post, pk=pk)
+        session_key = f'post_viewed_{pk}'
+
+        if not request.session.get(session_key, False):
+            post.views += 1
+            post.save()
+            request.session[session_key] = True
+        serializer = self.get_serializer(post)
+        return Response(serializer.data)
+
 
 class PostLikeAPI(APIView):
     def post(self, request, pk):

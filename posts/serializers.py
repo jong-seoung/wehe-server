@@ -21,6 +21,7 @@ class PostSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "like_count",
+            "views",
         ]
 
     author_nickname = serializers.SerializerMethodField("get_author_nickname")
@@ -53,6 +54,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "like_count",
             "comment_set",
             "comment_count",
+            "views",
         ]
 
     author_nickname = serializers.SerializerMethodField("get_author_nickname")
