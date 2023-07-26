@@ -14,6 +14,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
+BASE_URL = get_env_variable("BASE_URL")
+
 SECRET_KEY = get_env_variable("DJANGO_SECRET")
 STATE = get_env_variable("STATE")
 KAKAO_REST_API_KEY = get_env_variable("KAKAO_REST_API_KEY")
