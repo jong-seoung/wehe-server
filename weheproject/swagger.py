@@ -21,6 +21,7 @@ def get_swagger_urls():
                         "\n로컬에서 개발하실 때에는 하단의 HTTP 스키마를 선택해 주시고, 실제 서버에서는 HTTPS 스키마를 선택해 주세요.",
             terms_of_service="https://github.com/orgs/Team-We-Here/repositories",
         ),
+        generator_class=BothHttpAndHttpsSchemaGenerator,
         validators=["flex"],
         public=True,
         permission_classes=[permissions.AllowAny],
