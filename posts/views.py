@@ -27,9 +27,9 @@ class PostDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwnerOrReadOnly]
 
     def retrieve(self, request, *args, **kwargs):
-        pk = self.kwargs.get('pk')
+        pk = self.kwargs.get("pk")
         post = get_object_or_404(Post, pk=pk)
-        session_key = f'post_viewed_{pk}'
+        session_key = f"post_viewed_{pk}"
 
         if not request.session.get(session_key, False):
             post.views += 1
