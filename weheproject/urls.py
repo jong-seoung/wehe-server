@@ -21,5 +21,5 @@ urlpatterns = [
     ),
 ]
 
-if settings.DEBUG:
-    urlpatterns += get_swagger_urls()
+# if settings.DEBUG:
+urlpatterns += get_swagger_urls()
