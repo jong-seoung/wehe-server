@@ -18,7 +18,7 @@ def get_swagger_urls():
             title="weheproject API",
             default_version="v1",
             description="Wehe API 문서입니다.\n토큰 인증을 하실 때는 헤더에 'Token xxx' 형태로 액세스 토큰에 Token(Bearer) 접두사를 붙여주세요."
-                        "\n로컬에서 개발하실 때에는 하단의 HTTP 스키마를 선택해 주시고, 실제 서버에서는 HTTPS 스키마를 선택해 주세요.",
+            "\n로컬에서 개발하실 때에는 하단의 HTTP 스키마를 선택해 주시고, 실제 서버에서는 HTTPS 스키마를 선택해 주세요.",
             terms_of_service="https://github.com/orgs/Team-We-Here/repositories",
         ),
         generator_class=BothHttpAndHttpsSchemaGenerator,

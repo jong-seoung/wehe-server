@@ -20,7 +20,7 @@ class CommentCreateAPI(generics.CreateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        post_id = self.kwargs['post_pk']
+        post_id = self.kwargs["post_pk"]
         serializer.save(author=self.request.user, post_id=post_id)
 
 
@@ -29,4 +29,3 @@ class CommentDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CommentSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsOwnerOrReadOnly]
-

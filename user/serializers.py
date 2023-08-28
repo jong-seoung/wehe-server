@@ -1,6 +1,8 @@
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
+from user.models import User, UserImage
+from skills.models import Skill
 
 
 class TokenResponseSerializer(serializers.Serializer):
@@ -51,3 +53,33 @@ class LogoutSerializer(serializers.Serializer):
 
         except TokenError:
             return {"message": "bad_token"}
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "password",
+            "created_at",
+            "updated_at",
+            "email",
+            "name",
+            "nickname",
+            "birthday",
+            "user_image",
+            "profile_img",
+            "skills_list",
+        ]
+
+    skills_list = serializers.SerializerMethodField("get_skills_list")
+    profile_img = serializers.SerializerMethodField("get_profile_img")
+
+    def get_profile_img(self, obj):
+        profile_img = UserImage.objects.get(id=obj.user_image_id)
+        return profile_img.image.url
+
+    def get_skills_list(self, obj):
+        skills_queryset = Skill.objects.filter(user=obj)
+        skills_list = [skill.name for skill in skills_queryset]
+        return skills_list
