@@ -15,7 +15,7 @@ from user.social_views.github_login import (
     GithubCallbackView,
     GithubLoginToDjango,
 )
-from .views import LogoutAPIView
+from .views import LogoutAPIView, UserInfoAPI
 
 
 urlpatterns = [
@@ -43,4 +43,5 @@ urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     path("logout/", LogoutAPIView.as_view(), name="logout"),
+    path("info/<int:pk>/", UserInfoAPI.as_view(), name="user-info"),
 ]
