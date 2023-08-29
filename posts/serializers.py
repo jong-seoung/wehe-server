@@ -1,5 +1,6 @@
 from posts.models import Post, Like
 from skills.models import Skill
+from roles.models import Role
 from rest_framework import serializers
 from comments.serializers import CommentSerializer
 
@@ -13,7 +14,7 @@ class PostSerializer(serializers.ModelSerializer):
             "author_nickname",
             "schedule",
             "deadline",
-            "role",
+            "roles_list",
             "skills_list",
             "contact",
             "contact_url",
@@ -25,6 +26,7 @@ class PostSerializer(serializers.ModelSerializer):
         ]
 
     skills_list = serializers.SerializerMethodField("get_skills_list")
+    roles_list = serializers.SerializerMethodField("get_roles_list")
     author_nickname = serializers.SerializerMethodField("get_author_nickname")
     like_count = serializers.SerializerMethodField("get_like_count")
 
@@ -40,6 +42,11 @@ class PostSerializer(serializers.ModelSerializer):
         skills_list = [skill.name for skill in skills_queryset]
         return skills_list
 
+    def get_roles_list(self, obj):
+        roles_queryset = Role.objects.filter(post=obj)
+        roles_list = [role.name for role in roles_queryset]
+        return roles_list
+
 
 class PostDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,7 +57,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "author_nickname",
             "schedule",
             "deadline",
-            "role",
+            "roles_list",
             "skills_list",
             "contact",
             "contact_url",
@@ -64,6 +71,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
         ]
 
     skills_list = serializers.SerializerMethodField("get_skills_list")
+    roles_list = serializers.SerializerMethodField("get_roles_list")
     author_nickname = serializers.SerializerMethodField("get_author_nickname")
     like_count = serializers.SerializerMethodField("get_like_count")
     comment_set = CommentSerializer(many=True, read_only=True)
@@ -80,3 +88,8 @@ class PostDetailSerializer(serializers.ModelSerializer):
         skills_queryset = Skill.objects.filter(post=obj)
         skills_list = [skill.name for skill in skills_queryset]
         return skills_list
+
+    def get_roles_list(self, obj):
+        roles_queryset = Role.objects.filter(post=obj)
+        roles_list = [role.name for role in roles_queryset]
+        return roles_list

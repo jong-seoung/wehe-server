@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "skills",
     "comments",
     "posts",
+    "roles",
 ]
 
 MIDDLEWARE = [
