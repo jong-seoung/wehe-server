@@ -3,6 +3,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from user.models import User, UserImage
 from skills.models import Skill
+from roles.models import Role
 
 
 class TokenResponseSerializer(serializers.Serializer):
@@ -70,9 +71,11 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "user_image",
             "profile_img",
             "skills_list",
+            "roles_list",
         ]
 
     skills_list = serializers.SerializerMethodField("get_skills_list")
+    roles_list = serializers.SerializerMethodField("get_roles_list")
     profile_img = serializers.SerializerMethodField("get_profile_img")
 
     def get_profile_img(self, obj):
@@ -83,3 +86,8 @@ class UserInfoSerializer(serializers.ModelSerializer):
         skills_queryset = Skill.objects.filter(user=obj)
         skills_list = [skill.name for skill in skills_queryset]
         return skills_list
+
+    def get_roles_list(self, obj):
+        roles_queryset = Role.objects.filter(post=obj.id)
+        roles_list = [role.name for role in roles_queryset]
+        return roles_list

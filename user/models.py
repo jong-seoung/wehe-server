@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 from django.db import models
 from core.models import TimeStampedModel
 from skills.models import Skill
+from roles.models import Role
 from django.utils.translation import gettext_lazy as _
 
 
@@ -60,6 +61,7 @@ class User(TimeStampedModel, AbstractBaseUser, PermissionsMixin):
     )
     birthday = models.DateField(_("birthday"), max_length=10, blank=True, null=True)
     skills = models.ManyToManyField(Skill)
+    roles = models.ManyToManyField(Role)
     user_image = models.OneToOneField(
         UserImage, on_delete=models.CASCADE, related_name="user"
     )
