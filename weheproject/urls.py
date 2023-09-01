@@ -21,5 +21,17 @@ urlpatterns = [
     ),
 ]
 
-# if settings.DEBUG:
 urlpatterns += get_swagger_urls()
+
+if settings.DEBUG:
+    from django.conf.urls.static import static
+
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+else:
+    from django.views.static import serve
+
+    urlpatterns += [
+        path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
+        path('static/<path:path>', serve, {'document_root': settings.STATIC_ROOT}),
+    ]

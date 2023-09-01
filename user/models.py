@@ -6,6 +6,10 @@ from core.models import TimeStampedModel
 from skills.models import Skill
 from roles.models import Role
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+import random
+import os
+import uuid
 
 
 class UserManager(BaseUserManager):
@@ -44,12 +48,20 @@ class UserManager(BaseUserManager):
 
 
 class UserImage(TimeStampedModel, models.Model):
+
+    def user_image_path(instance, filename):
+        today = timezone.now()
+        random_name = uuid.uuid4().hex
+        return os.path.join("profile_images", today.strftime("%Y-%m-%d"), f"{random_name}.webp")
+
     file_size = models.BigIntegerField(blank=True, null=True)
     image = models.ImageField(
         _("profile image"),
-        upload_to="profile_images/",
+        upload_to=user_image_path,
         blank=True,
-        default="basic_profile_image",
+        default=random.choice(["profile_images/basic/profile_image1.webp",
+                               "profile_images/basic/profile_image2.webp",
+                               "profile_images/basic/profile_image3.webp"]),
     )
 
 
