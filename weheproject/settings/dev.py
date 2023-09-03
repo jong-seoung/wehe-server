@@ -48,4 +48,5 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = ("https://port-0-wehe-k19y2kljve3tgo.sel4.cloudtype.app",)
+# CSRF_TRUSTED_ORIGINS = ("https://port-0-wehe-k19y2kljve3tgo.sel4.cloudtype.app",)
+CSRF_TRUSTED_ORIGINS = ("*",)
