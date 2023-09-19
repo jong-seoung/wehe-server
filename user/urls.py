@@ -6,7 +6,6 @@ from user.social_views.google_login import (
     GoogleLoginToDjango,
 )
 from user.social_views.kakao_login import (
-    KakaoLoginView,
     KakaoCallbackView,
     KakaoLoginToDjango,
 )
@@ -26,7 +25,6 @@ urlpatterns = [
         GoogleLoginToDjango.as_view(),
         name="google_login_to_django",
     ),
-    path("kakao/login/", KakaoLoginView.as_view(), name="kakao_login"),
     path("kakao/callback/", KakaoCallbackView.as_view(), name="kakao_callback"),
     path(
         "kakao/login/finish/",
