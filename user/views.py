@@ -23,7 +23,7 @@ class Constants:
     )
 
     REST_API_KEY = getattr(settings, "KAKAO_REST_API_KEY")
-    KAKAO_CALLBACK_URI = f"http://localhost:3000/kakao/"
+    KAKAO_CALLBACK_URI = f"http://localhost:3000/kakao"
 
     GITHUB_CALLBACK_URI = f"{BASE_URL}api/v1/user/github/callback/"
     GITHUB_CLIENT_ID = getattr(settings, "SOCIAL_AUTH_GITHUB_CLIENT_ID")
