@@ -14,8 +14,10 @@ class Post(TimeStampedModel, models.Model):
     contact = models.CharField()
     contact_url = models.TextField()
     views = models.PositiveIntegerField(default=0)
+    score = models.IntegerField(default=0)
 
-    is_private = models.BooleanField()
+    is_activate = models.BooleanField(default=True)
+    is_private = models.BooleanField(default=False)
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
