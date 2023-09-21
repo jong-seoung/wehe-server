@@ -18,7 +18,7 @@ def PostScore():
 
 def start():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(PostScore, trigger=CronTrigger(hours="1"), id='times_postscore')
+    scheduler.add_job(PostScore, trigger=CronTrigger(minute=0), id='times_postscore')
     scheduler.start()
 
     if __name__ == '__main__':
