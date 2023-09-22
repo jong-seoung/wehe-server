@@ -12,13 +12,15 @@ def PostScore():
         like_count = Like.objects.filter(post_id=i.id).count()
 
         t = (timezone.now() - i.created_at).days * 24
+        t += (int(timezone.now().hour) - int(i.created_at.hour))
         i.score = (i.views + like_count * 2 + comment_count * 3) // (t+2) ** 1.8
+        print(t)
         i.save()
 
 
 def start():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(PostScore, trigger=CronTrigger(minute=0), id='times_postscore')
+    scheduler.add_job(PostScore, 'interval', hours=1, id='times_postscore')
     scheduler.start()
 
     if __name__ == '__main__':
