@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from posts.models import Post, Like
 from posts.permissions import IsOwnerOrReadOnly
-from posts.serializers import PostSerializer, PostDetailSerializer
+from posts.serializers import PostSerializer, PostDetailSerializer, PopularPostSerializer
 from user.models import User
 
 
@@ -52,3 +52,10 @@ class PostLikeAPI(APIView):
             Like.objects.create(user_id=user.id, post_id=post.id)
             is_liked = True
         return Response({"is_liked": is_liked})
+
+
+class PopularPostAPI(generics.ListAPIView):
+    queryset = Post.objects.all().order_by('-score')[:4:]
+    serializer_class = PopularPostSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly]

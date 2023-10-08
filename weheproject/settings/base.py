@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "django.contrib.staticfiles",
     "corsheaders",
+    "django_apscheduler",
     "user",
     "core",
     "skills",
@@ -129,6 +130,9 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = "ko-kr"
 
 TIME_ZONE = "Asia/Seoul"
+
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+SCHEDULER_DEFAULT = True
 
 USE_I18N = True
 

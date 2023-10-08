@@ -17,6 +17,7 @@ requests = "2.31.0"
 whitenoise = "6.5.0"
 django-cors-headers = "4.2.0"
 djangorestframework-camel-case = "*"
+django-apscheduler = "*"
 
 [dev-packages]
 django-environ = "0.10.0"
