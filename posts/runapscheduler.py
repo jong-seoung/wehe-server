@@ -1,6 +1,5 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from django.utils import timezone
-from apscheduler.triggers.cron import CronTrigger
 from posts.models import Post, Like
 from comments.models import Comment
 
@@ -13,8 +12,7 @@ def PostScore():
 
         t = (timezone.now() - i.created_at).days * 24
         t += (int(timezone.now().hour) - int(i.created_at.hour))
-        i.score = (i.views + like_count * 2 + comment_count * 3) // (t+2) ** 1.8
-        print(t)
+        i.score = int((i.views * 100 + like_count * 200 + comment_count * 300) / (t+2) ** 1.1)
         i.save()
 
 

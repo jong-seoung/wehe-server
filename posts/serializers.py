@@ -74,3 +74,24 @@ class PostDetailSerializer(PostSerializerBase):
 
     comment_set = CommentSerializer(many=True, read_only=True)
     comment_count = serializers.IntegerField(source="comment_set.count", read_only=True)
+
+
+class PopularPostSerializer(PostSerializer):
+    class Meta:
+        model = Post
+        fields = [
+            "id",
+            "title",
+            "author_nickname",
+            "schedule",
+            "deadline",
+            "roles_list",
+            "skills_list",
+            "contact",
+            "contact_url",
+            "is_private",
+            "created_at",
+            "updated_at",
+            "like_count",
+            "views",
+        ]
