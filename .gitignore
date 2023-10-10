@@ -5,4 +5,4 @@ data/
 .DS_Store
 makefile
 db.sqlite3
-media/skill_images/
+media/
