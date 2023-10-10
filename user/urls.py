@@ -6,6 +6,7 @@ from user.social_views.google_login import (
     GoogleLoginToDjango,
 )
 from user.social_views.kakao_login import (
+    KakaoLoginView,
     KakaoCallbackView,
     KakaoLoginToDjango,
 )
@@ -14,7 +15,9 @@ from user.social_views.github_login import (
     GithubCallbackView,
     GithubLoginToDjango,
 )
-from .views import LogoutAPIView, UserInfoAPI
+from user.views import LogoutAPIView
+from user.userinfo import UserInfoAPI
+from user.userprofile import ProfileImageAPI
 
 
 urlpatterns = [
@@ -25,6 +28,7 @@ urlpatterns = [
         GoogleLoginToDjango.as_view(),
         name="google_login_to_django",
     ),
+    path("kakao/login/", KakaoLoginView.as_view(), name="kakao_login"),
     path("kakao/callback/", KakaoCallbackView.as_view(), name="kakao_callback"),
     path(
         "kakao/login/finish/",
@@ -41,5 +45,6 @@ urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     path("logout/", LogoutAPIView.as_view(), name="logout"),
-    path("info/<int:pk>/", UserInfoAPI.as_view(), name="user-info"),
+    path("info/", UserInfoAPI.as_view(), name="user-info"),
+    path("profile/", ProfileImageAPI.as_view(), name="profile-upload"),
 ]
