@@ -16,6 +16,18 @@ from user.views import Constants
 from drf_yasg import openapi
 
 
+class KakaoLoginView(APIView):
+    permission_classes = [AllowAny]
+    schema = None
+
+    @swagger_auto_schema(operation_id="카카오 로그인")
+    def get(self, request):
+        return redirect(
+            f"https://kauth.kakao.com/oauth/authorize?client_id={Constants.REST_API_KEY}"
+            f"&redirect_uri={Constants.KAKAO_CALLBACK_URI}&response_type=code"
+        )
+
+
 class KakaoCallbackView(APIView):
     permission_classes = [AllowAny]
 

@@ -1,13 +1,7 @@
 from django.conf import settings
 from rest_framework.views import APIView
-from rest_framework.generics import GenericAPIView
-from rest_framework import mixins
-from user.serializers import LogoutSerializer, UserInfoSerializer
+from user.serializers import LogoutSerializer
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from user.models import User
-from user.permissions import IsOwnerOrReadOnly
 
 
 class Constants:
@@ -39,16 +33,3 @@ class LogoutAPIView(APIView):
         message = serializer.save()
 
         return Response(message)
-
-
-class UserInfoAPI(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, GenericAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserInfoSerializer
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def patch(self, request, *args, **kwargs):
-        self.partial_update(request, *args, **kwargs)

@@ -24,13 +24,14 @@ class TokenResponseSerializer(serializers.Serializer):
     def to_representation(self, instance):
         nickname = self.user.nickname
         if nickname is None:
-            message = "first login"
+            message = True
         else:
-            message = "not first login"
+            message = False
 
         return {
             "message": message,
             "token": {
+                "email": self.user.email,
                 "access": self.get_access_token(),
                 "refresh": self.get_refresh_token(),
             },
@@ -88,6 +89,6 @@ class UserInfoSerializer(serializers.ModelSerializer):
         return skills_list
 
     def get_roles_list(self, obj):
-        roles_queryset = Role.objects.filter(post=obj.id)
+        roles_queryset = Role.objects.filter(user=obj)
         roles_list = [role.name for role in roles_queryset]
         return roles_list
