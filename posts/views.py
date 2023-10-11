@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -18,6 +19,24 @@ class PostAPI(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def get(self, request, *args, **kwargs):
+
+        page = self.kwargs.get('page')
+        paginator = Paginator(self.queryset, 16)
+        try:
+            page_obj = paginator.page(page)
+        except PageNotAnInteger:
+            page = 1
+            page_obj = paginator.page(page)
+        except EmptyPage:
+            page = paginator.num_pages
+            page_obj = paginator.page(page)
+
+        page_obj = page_obj.object_list
+        self.queryset = page_obj
+
+        return self.list(request, *args, **kwargs)
 
 
 class PostDetailAPI(generics.RetrieveUpdateDestroyAPIView):
