@@ -11,7 +11,7 @@ from posts.serializers import PostSerializer, PostDetailSerializer, PopularPostS
 from user.models import User
 
 
-class PostAPI(generics.ListCreateAPIView):
+class PostAPI(generics.ListAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     authentication_classes = [JWTAuthentication]
@@ -44,9 +44,10 @@ class PostDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PostDetailSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsOwnerOrReadOnly]
+    allowed_methods = ["GET", "DELETE", "PATCH"]
 
     def retrieve(self, request, *args, **kwargs):
-        pk = self.kwargs.get("pk")
+        pk = self.kwargs.get("post_id")
         post = get_object_or_404(Post, pk=pk)
         session_key = f"post_viewed_{pk}"
 
@@ -59,8 +60,8 @@ class PostDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 
 
 class PostLikeAPI(APIView):
-    def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)
+    def post(self, request, post_id):
+        post = get_object_or_404(Post, pk=post_id)
         email = request.user
         user = User.objects.get(email=email)
         try:
