@@ -20,7 +20,6 @@ class KakaoLoginView(APIView):
     permission_classes = [AllowAny]
     schema = None
 
-    @swagger_auto_schema(operation_id="카카오 로그인")
     def get(self, request):
         return redirect(
             f"https://kauth.kakao.com/oauth/authorize?client_id={Constants.REST_API_KEY}"
@@ -33,6 +32,7 @@ class KakaoCallbackView(APIView):
 
     @swagger_auto_schema(
         operation_id="카카오 로그인 콜백",
+        tags=['로그인'],
         manual_parameters=[
             openapi.Parameter(
                 'code',
