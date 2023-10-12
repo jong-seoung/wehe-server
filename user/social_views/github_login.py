@@ -13,12 +13,13 @@ from user.models import User
 from user.serializers import TokenResponseSerializer
 from rest_framework.response import Response
 from user.views import Constants
+from drf_yasg import openapi
 
 
 class GithubLoginView(APIView):
     permission_classes = [AllowAny]
+    schema = None
 
-    @swagger_auto_schema(operation_id="깃허브 로그인")
     def get(self, request):
         return redirect(
             f"https://github.com/login/oauth/authorize?client_id={Constants.GITHUB_CLIENT_ID}"
@@ -28,9 +29,20 @@ class GithubLoginView(APIView):
 
 class GithubCallbackView(APIView):
     permission_classes = [AllowAny]
-    schema = None
 
-    @swagger_auto_schema(operation_id="깃허브 로그인 콜백")
+    @swagger_auto_schema(
+        operation_id="깃허브 로그인 콜백",
+        tags=['로그인'],
+        manual_parameters=[
+            openapi.Parameter(
+                'code',
+                in_=openapi.IN_QUERY,
+                description='깃허브에서 반환한 인증 코드',
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+        ],
+    )
     def get(self, request):
         BASE_URL = Constants.BASE_URL
         GITHUB_CLIENT_ID = Constants.GITHUB_CLIENT_ID

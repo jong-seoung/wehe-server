@@ -13,12 +13,13 @@ from user.models import User
 from user.serializers import TokenResponseSerializer
 from rest_framework.response import Response
 from user.views import Constants
+from drf_yasg import openapi
 
 
 class GoogleLoginView(APIView):
     permission_classes = [AllowAny]
+    schema = None
 
-    @swagger_auto_schema(operation_id="구글 로그인")
     def get(self, request):
         return redirect(
             f"https://accounts.google.com/o/oauth2/v2/auth?client_id={Constants.GOOGLE_CLIENT_ID}"
@@ -28,23 +29,32 @@ class GoogleLoginView(APIView):
 
 class GoogleCallbackView(APIView):
     permission_classes = [AllowAny]
-    schema = None
 
+    @swagger_auto_schema(
+        operation_id="구글 로그인 콜백",
+        tags=['로그인'],
+        manual_parameters=[
+            openapi.Parameter(
+                'code',
+                in_=openapi.IN_QUERY,
+                description='구글에서 반환한 인증 코드',
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+        ],
+    )
     def get(self, request):
         BASE_URL = Constants.BASE_URL
         GOOGLE_CLIENT_ID = Constants.GOOGLE_CLIENT_ID
         GOOGLE_CLIENT_SECRET = Constants.GOOGLE_CLIENT_SECRET
         GOOGLE_CALLBACK_URI = Constants.GOOGLE_CALLBACK_URI
         code = request.GET.get("code")
+        state = 'random_string'
 
-        data = {
-            "code": code,
-            "client_id": GOOGLE_CLIENT_ID,
-            "client_secret": GOOGLE_CLIENT_SECRET,
-            "redirect_uri": GOOGLE_CALLBACK_URI,
-            "grant_type": "authorization_code",
-        }
-        token_req = requests.post("https://oauth2.googleapis.com/token", data=data)
+        token_req = requests.post(f"https://oauth2.googleapis.com/token?client_id={GOOGLE_CLIENT_ID}"
+                                  f"&client_secret={GOOGLE_CLIENT_SECRET}&code={code}"
+                                  f"&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}"
+                                  f"&state={state}")
         token_req_json = token_req.json()
         error = token_req_json.get("error")
         if error is not None:
@@ -53,10 +63,7 @@ class GoogleCallbackView(APIView):
             return JsonResponse(token_req_json)
         access_token = token_req_json.get("access_token")
 
-        email_req = requests.get(
-            f"https://www.googleapis.com/oauth2/v1/userinfo",
-            params={"alt": "json", "access_token": access_token},
-        )
+        email_req = requests.get(f"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={access_token}")
         email_req_status = email_req.status_code
         if email_req_status != 200:
             return JsonResponse(
@@ -64,12 +71,10 @@ class GoogleCallbackView(APIView):
             )
         email_req_json = email_req.json()
         email = email_req_json.get("email")
-        print(email)
         if not email:
             return JsonResponse(
                 {"error": "email not found"}, status=status.HTTP_400_BAD_REQUEST
             )
-
         try:
             user = User.objects.get(email=email)
             social_user = SocialAccount.objects.get(user=user)
@@ -87,7 +92,7 @@ class GoogleCallbackView(APIView):
             accept_status = accept.status_code
             if accept_status != 200:
                 return JsonResponse(
-                    {"err_msg": "failed to signin1"}, status=accept_status
+                    {"err_msg": "failed to signin"}, status=accept_status
                 )
             serializer = TokenResponseSerializer(user)
             data = serializer.to_representation(serializer)
@@ -98,7 +103,7 @@ class GoogleCallbackView(APIView):
             return res
 
         except User.DoesNotExist:
-            data = {"app": GOOGLE_CLIENT_ID, "token": access_token, "code": code}
+            data = {'access_token': access_token, 'code': code}
             accept = requests.post(
                 f"{BASE_URL}api/v1/user/google/login/finish/", data=data
             )
@@ -109,8 +114,9 @@ class GoogleCallbackView(APIView):
                 )
             user = User.objects.get(email=email)
             serializer = TokenResponseSerializer(user)
+            data = serializer.to_representation(serializer)
             res = Response(
-                serializer.data,
+                data,
                 status=status.HTTP_200_OK,
             )
             return res
@@ -118,6 +124,6 @@ class GoogleCallbackView(APIView):
 
 class GoogleLoginToDjango(SocialLoginView):
     adapter_class = google_view.GoogleOAuth2Adapter
-    schema = None
     callback_url = Constants.GOOGLE_CALLBACK_URI
     client_class = OAuth2Client
+    schema = None
