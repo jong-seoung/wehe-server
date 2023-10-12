@@ -19,8 +19,8 @@ class UserInfoAPI(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, GenericAPI
 
     def get_user_instance(self):
         auth_header = self.request.headers.get('Authorization')
-        access_tokne = auth_header.split(' ')[1]
-        decoded = AccessToken(access_tokne)
+        access_token = auth_header.split(' ')[1]
+        decoded = AccessToken(access_token)
         user_id = decoded['user_id']
         self.user_instance = User.objects.get(id=user_id)
         return self.user_instance
