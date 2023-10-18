@@ -18,6 +18,9 @@ whitenoise = "6.5.0"
 django-cors-headers = "4.2.0"
 djangorestframework-camel-case = "*"
 django-apscheduler = "*"
+channels = "==3.0.5"
+daphne = "*"
+django-eventstream = "*"
 
 [dev-packages]
 django-environ = "0.10.0"
