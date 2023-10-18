@@ -11,14 +11,11 @@ from posts.serializers import PostSerializer, PostDetailSerializer, PopularPostS
 from user.models import User
 
 
-class PostAPI(generics.ListAPIView):
+class PostListAPI(generics.ListAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
 
     def get(self, request, *args, **kwargs):
 
@@ -37,6 +34,16 @@ class PostAPI(generics.ListAPIView):
         self.queryset = page_obj
 
         return self.list(request, *args, **kwargs)
+
+
+class PostCreateAPI(generics.CreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 
 class PostDetailAPI(generics.RetrieveUpdateDestroyAPIView):
