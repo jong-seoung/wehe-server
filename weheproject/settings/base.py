@@ -1,6 +1,5 @@
 from pathlib import Path
 import os
-import environ
 from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -14,6 +13,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 INSTALLED_APPS = [
+    "channels",
+    "django_eventstream",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -42,9 +43,11 @@ INSTALLED_APPS = [
     "comments",
     "posts",
     "roles",
+    "alarms",
 ]
 
 MIDDLEWARE = [
+    'django_grip.GripMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -80,6 +83,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "weheproject.wsgi.application"
+ASGI_APPLICATION = "weheproject.asgi.application"
+EVENTSTREAM_STORAGE_CLASS = 'django_eventstream.storage.DjangoModelStorage'
 
 REST_USE_JWT = True
 

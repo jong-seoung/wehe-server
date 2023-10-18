@@ -6,6 +6,9 @@ from rest_framework.response import Response
 from comments.models import Comment
 from posts.permissions import IsOwnerOrReadOnly
 from posts.serializers import CommentSerializer
+from user.models import User
+from posts.models import Post
+from django_eventstream import send_event
 
 
 class CommentCreateAPI(generics.ListCreateAPIView):
@@ -33,6 +36,12 @@ class CommentCreateAPI(generics.ListCreateAPIView):
         content = request.data.get('content')
         comment = Comment.objects.create(post_id=post_id, author_id=author_id, content=content)
         comment = self.serializer_class(comment)
+
+        user = User.objects.get(id=author_id)
+        post = Post.objects.get(id=post_id)
+        send_message = f'{user.nickname}님이 댓글을 남겼습니다.\n"{content}"\n{post.title}'
+
+        send_event('user-{}'.format(post.author_id), 'message', send_message, json_encode=False)
         return Response(comment.data)
 
 
