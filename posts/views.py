@@ -7,8 +7,14 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from posts.models import Post, Like
 from posts.permissions import IsOwnerOrReadOnly
-from posts.serializers import PostSerializer, PostDetailSerializer, PopularPostSerializer
+from posts.serializers import (
+    PostSerializer,
+    PostDetailSerializer,
+    PopularPostSerializer,
+)
 from user.models import User
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 class PostListAPI(generics.ListAPIView):
@@ -17,9 +23,19 @@ class PostListAPI(generics.ListAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "page",
+                in_=openapi.IN_QUERY,
+                description="페이지 번호",
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+        ],
+    )
     def get(self, request, *args, **kwargs):
-
-        page = self.kwargs.get('page')
+        page = request.GET.get("page")
         paginator = Paginator(self.queryset, 16)
         try:
             page_obj = paginator.page(page)
@@ -82,7 +98,7 @@ class PostLikeAPI(APIView):
 
 
 class PopularPostAPI(generics.ListAPIView):
-    queryset = Post.objects.all().order_by('-score')[:4:]
+    queryset = Post.objects.all().order_by("-score")[:4:]
     serializer_class = PopularPostSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
