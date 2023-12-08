@@ -7,6 +7,7 @@ from user.models import User
 
 class Post(TimeStampedModel, models.Model):
     title = models.CharField(max_length=256)
+    content = models.TextField()
     schedule = models.CharField(max_length=35)
     deadline = models.DateField()
     roles = models.ManyToManyField(Role)

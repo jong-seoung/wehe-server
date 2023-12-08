@@ -35,6 +35,7 @@ class PostSerializer(PostSerializerBase):
         fields = [
             "id",
             "title",
+            "content",
             "author_nickname",
             "schedule",
             "deadline",
@@ -56,6 +57,7 @@ class PostDetailSerializer(PostSerializerBase):
         fields = [
             "id",
             "title",
+            "content",
             "author_nickname",
             "schedule",
             "deadline",
@@ -82,6 +84,7 @@ class PopularPostSerializer(PostSerializer):
         fields = [
             "id",
             "title",
+            "content",
             "author_nickname",
             "schedule",
             "deadline",
