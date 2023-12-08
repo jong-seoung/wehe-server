@@ -13,12 +13,13 @@ from user.models import User
 from user.serializers import TokenResponseSerializer
 from rest_framework.response import Response
 from user.views import Constants
+from drf_yasg import openapi
 
 
 class KakaoLoginView(APIView):
     permission_classes = [AllowAny]
+    schema = None
 
-    @swagger_auto_schema(operation_id="카카오 로그인")
     def get(self, request):
         return redirect(
             f"https://kauth.kakao.com/oauth/authorize?client_id={Constants.REST_API_KEY}"
@@ -28,9 +29,20 @@ class KakaoLoginView(APIView):
 
 class KakaoCallbackView(APIView):
     permission_classes = [AllowAny]
-    schema = None
 
-    @swagger_auto_schema(operation_id="카카오 로그인 콜백")
+    @swagger_auto_schema(
+        operation_id="카카오 로그인 콜백",
+        tags=['로그인'],
+        manual_parameters=[
+            openapi.Parameter(
+                'code',
+                in_=openapi.IN_QUERY,
+                description='카카오에서 반환한 인증 코드',
+                type=openapi.TYPE_STRING,
+                required=True,
+            ),
+        ],
+    )
     def get(self, request):
         BASE_URL = Constants.BASE_URL
         REST_API_KEY = Constants.REST_API_KEY

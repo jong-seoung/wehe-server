@@ -1,6 +1,9 @@
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
+from user.models import User, UserImage
+from skills.models import Skill
+from roles.models import Role
 
 
 class TokenResponseSerializer(serializers.Serializer):
@@ -21,13 +24,14 @@ class TokenResponseSerializer(serializers.Serializer):
     def to_representation(self, instance):
         nickname = self.user.nickname
         if nickname is None:
-            message = "first login"
+            message = True
         else:
-            message = "not first login"
+            message = False
 
         return {
             "message": message,
             "token": {
+                "email": self.user.email,
                 "access": self.get_access_token(),
                 "refresh": self.get_refresh_token(),
             },
@@ -51,3 +55,40 @@ class LogoutSerializer(serializers.Serializer):
 
         except TokenError:
             return {"message": "bad_token"}
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "password",
+            "created_at",
+            "updated_at",
+            "email",
+            "name",
+            "nickname",
+            "birthday",
+            "user_image",
+            "profile_img",
+            "skills_list",
+            "roles_list",
+        ]
+
+    skills_list = serializers.SerializerMethodField("get_skills_list")
+    roles_list = serializers.SerializerMethodField("get_roles_list")
+    profile_img = serializers.SerializerMethodField("get_profile_img")
+
+    def get_profile_img(self, obj):
+        profile_img = UserImage.objects.get(id=obj.user_image_id)
+        return profile_img.image.url
+
+    def get_skills_list(self, obj):
+        skills_queryset = Skill.objects.filter(user=obj)
+        skills_list = [skill.name for skill in skills_queryset]
+        return skills_list
+
+    def get_roles_list(self, obj):
+        roles_queryset = Role.objects.filter(user=obj)
+        roles_list = [role.name for role in roles_queryset]
+        return roles_list

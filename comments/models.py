@@ -5,6 +5,6 @@ from posts.models import Post
 
 
 class Comment(TimeStampedModel, models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     content = models.TextField()

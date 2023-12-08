@@ -1,19 +1,24 @@
 from django.db import models
 from core.models import TimeStampedModel
 from skills.models import Skill
+from roles.models import Role
 from user.models import User
 
 
 class Post(TimeStampedModel, models.Model):
     title = models.CharField(max_length=256)
+    content = models.TextField()
     schedule = models.CharField(max_length=35)
     deadline = models.DateField()
-    role = models.CharField()
+    roles = models.ManyToManyField(Role)
     skills = models.ManyToManyField(Skill)
     contact = models.CharField()
     contact_url = models.TextField()
+    views = models.PositiveIntegerField(default=0)
+    score = models.IntegerField(default=0)
 
-    is_private = models.BooleanField()
+    is_activate = models.BooleanField(default=True)
+    is_private = models.BooleanField(default=False)
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 

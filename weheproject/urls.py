@@ -6,7 +6,9 @@ from weheproject.swagger import get_swagger_urls
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('api/v1/alarm/', include('alarms.urls')),
     path("api/v1/post/", include("posts.urls")),
+    path("api/v1/post/comment/", include("comments.urls")),
     path("api/v1/user/", include("user.urls")),
     path("verify-email/", VerifyEmailView.as_view(), name="rest_verify_email"),
     path(
@@ -21,5 +23,17 @@ urlpatterns = [
     ),
 ]
 
+urlpatterns += get_swagger_urls()
+
 if settings.DEBUG:
-    urlpatterns += get_swagger_urls()
+    from django.conf.urls.static import static
+
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+else:
+    from django.views.static import serve
+
+    urlpatterns += [
+        path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
+        path('static/<path:path>', serve, {'document_root': settings.STATIC_ROOT}),
+    ]

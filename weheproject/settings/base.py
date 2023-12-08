@@ -1,6 +1,5 @@
 from pathlib import Path
 import os
-import environ
 from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -14,6 +13,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 INSTALLED_APPS = [
+    "channels",
+    "django_eventstream",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -35,14 +36,18 @@ INSTALLED_APPS = [
     "drf_yasg",
     "django.contrib.staticfiles",
     "corsheaders",
+    "django_apscheduler",
     "user",
     "core",
     "skills",
     "comments",
     "posts",
+    "roles",
+    "alarms",
 ]
 
 MIDDLEWARE = [
+    'django_grip.GripMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -50,6 +55,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "djangorestframework_camel_case.middleware.CamelCaseMiddleWare",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
@@ -77,6 +83,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "weheproject.wsgi.application"
+ASGI_APPLICATION = "weheproject.asgi.application"
+EVENTSTREAM_STORAGE_CLASS = 'django_eventstream.storage.DjangoModelStorage'
 
 REST_USE_JWT = True
 
@@ -86,6 +94,15 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DEFAULT_RENDERER_CLASSES": (
+        "djangorestframework_camel_case.render.CamelCaseJSONRenderer",
+        "djangorestframework_camel_case.render.CamelCaseBrowsableAPIRenderer",
+    ),
+    "DEFAULT_PARSER_CLASSES": (
+        "djangorestframework_camel_case.parser.CamelCaseFormParser",
+        "djangorestframework_camel_case.parser.CamelCaseMultiPartParser",
+        "djangorestframework_camel_case.parser.CamelCaseJSONParser",
     ),
 }
 
@@ -119,6 +136,9 @@ LANGUAGE_CODE = "ko-kr"
 
 TIME_ZONE = "Asia/Seoul"
 
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+SCHEDULER_DEFAULT = True
+
 USE_I18N = True
 
 USE_TZ = True
@@ -135,6 +155,10 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 
 SITE_ID = 1
 
-STATIC_URL = "/static/"
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
