@@ -5,9 +5,21 @@ from rest_framework import serializers
 from comments.serializers import CommentSerializer
 
 
+class SkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Skill
+        fields = '__all__'
+
+
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = '__all__'
+
+
 class PostSerializerBase(serializers.ModelSerializer):
-    skills_list = serializers.SerializerMethodField("get_skills_list")
-    roles_list = serializers.SerializerMethodField("get_roles_list")
+    skills = SkillSerializer(many=True)
+    roles = RoleSerializer(many=True)
     author_nickname = serializers.SerializerMethodField("get_author_nickname")
     like_count = serializers.SerializerMethodField("get_like_count")
 
@@ -17,16 +29,6 @@ class PostSerializerBase(serializers.ModelSerializer):
     def get_like_count(self, obj):
         like_count = Like.objects.filter(post=obj).count()
         return like_count
-
-    def get_skills_list(self, obj):
-        skills_queryset = Skill.objects.filter(post=obj)
-        skills_list = [skill.name for skill in skills_queryset]
-        return skills_list
-
-    def get_roles_list(self, obj):
-        roles_queryset = Role.objects.filter(post=obj)
-        roles_list = [role.name for role in roles_queryset]
-        return roles_list
 
 
 class PostSerializer(PostSerializerBase):
@@ -39,8 +41,8 @@ class PostSerializer(PostSerializerBase):
             "author_nickname",
             "schedule",
             "deadline",
-            "roles_list",
-            "skills_list",
+            "roles",
+            "skills",
             "contact",
             "contact_url",
             "is_private",
@@ -49,6 +51,26 @@ class PostSerializer(PostSerializerBase):
             "like_count",
             "views",
         ]
+
+    def create(self, validated_data):
+        validated_data['author'] = self.context['request'].user
+
+        roles_data = validated_data.pop('roles', [])
+        skills_data = validated_data.pop('skills', [])
+
+        post = Post.objects.create(**validated_data)
+
+        for i in range(len(roles_data)):
+            role_name = roles_data[i]['name']
+            role_instance, created = Role.objects.get_or_create(name=role_name)
+            post.roles.add(role_instance)
+
+        for i in range(len(skills_data)):
+            skill_name = skills_data[i]['name']
+            skill_instance, created = Skill.objects.get_or_create(name=skill_name)
+            post.skills.add(skill_instance)
+
+        return post
 
 
 class PostDetailSerializer(PostSerializerBase):
@@ -61,8 +83,8 @@ class PostDetailSerializer(PostSerializerBase):
             "author_nickname",
             "schedule",
             "deadline",
-            "roles_list",
-            "skills_list",
+            "roles",
+            "skills",
             "contact",
             "contact_url",
             "is_private",
@@ -77,6 +99,33 @@ class PostDetailSerializer(PostSerializerBase):
     comment_set = CommentSerializer(many=True, read_only=True)
     comment_count = serializers.IntegerField(source="comment_set.count", read_only=True)
 
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.content = validated_data.get('content', instance.content)
+        instance.schedule = validated_data.get('schedule', instance.schedule)
+        instance.deadline = validated_data.get('deadline', instance.deadline)
+        instance.contact = validated_data.get('contact', instance.contact)
+        instance.contact_url = validated_data.get('contact_url', instance.contact_url)
+        instance.is_private = validated_data.get('is_private', instance.is_private)
+
+        instance.save()
+        instance.roles.clear()
+        instance.skills.clear()
+
+        roles_data = validated_data.get('roles', [])
+        skills_data = validated_data.get('skills', [])
+
+        for i in range(len(roles_data)):
+            role_name = roles_data[i]['name']
+            role_instance, created = Role.objects.get_or_create(name=role_name)
+            instance.roles.add(role_instance)
+
+        for i in range(len(skills_data)):
+            skill_name = skills_data[i]['name']
+            skill_instance, created = Skill.objects.get_or_create(name=skill_name)
+            instance.skills.add(skill_instance)
+
+        return instance
 
 class PopularPostSerializer(PostSerializer):
     class Meta:
@@ -88,8 +137,8 @@ class PopularPostSerializer(PostSerializer):
             "author_nickname",
             "schedule",
             "deadline",
-            "roles_list",
-            "skills_list",
+            "roles",
+            "skills",
             "contact",
             "contact_url",
             "is_private",

@@ -58,15 +58,13 @@ class PostCreateAPI(generics.CreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
 
 class PostDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostDetailSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsOwnerOrReadOnly]
+    lookup_field = 'post_id'
     allowed_methods = ["GET", "DELETE", "PATCH"]
 
     def retrieve(self, request, *args, **kwargs):
@@ -80,6 +78,27 @@ class PostDetailAPI(generics.RetrieveUpdateDestroyAPIView):
             request.session[session_key] = True
         serializer = self.get_serializer(post)
         return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        pk = self.kwargs.get("post_id")
+        post = get_object_or_404(Post, pk=pk)
+
+        self.check_object_permissions(request, post)
+
+        serializer = self.get_serializer(post, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        pk = self.kwargs.get("post_id")
+        post = get_object_or_404(Post, pk=pk)
+        self.check_object_permissions(request, post)
+
+        post.delete()
+
+        return Response({"message": "Object deleted successfully."})
 
 
 class PostLikeAPI(APIView):
