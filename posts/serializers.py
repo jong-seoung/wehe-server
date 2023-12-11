@@ -28,10 +28,10 @@ class PostSerializer(PostSerializerBase):
         model = Post
         fields = [
             "id",
+            "author_nickname",
             "author_image",
             "title",
             "content",
-            "author_nickname",
             "schedule",
             "deadline",
             "roles",

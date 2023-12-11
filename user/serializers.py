@@ -78,12 +78,12 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "birthday",
             "user_image",
             "profile_img",
-            "skills_list",
-            "roles_list",
+            "skills",
+            "roles",
         ]
 
-    skills_list = SkillSerializer(many=True)
-    roles_list = RoleSerializer(many=True)
+    skills = SkillSerializer(many=True)
+    roles = RoleSerializer(many=True)
     profile_img = serializers.SerializerMethodField("get_profile_img")
 
     def get_profile_img(self, obj):
