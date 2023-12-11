@@ -2,8 +2,14 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from user.models import User, UserImage
-from skills.models import Skill
-from roles.models import Role
+from skills.serializers import SkillSerializer
+from roles.serializers import RoleSerializer
+
+
+class UserImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserImage
+        fields = ['image']
 
 
 class TokenResponseSerializer(serializers.Serializer):
@@ -45,14 +51,15 @@ class LogoutSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         self.token = attrs["refresh"]
+        if not self.token:
+            raise serializers.ValidationError('Token is required.')
         return attrs
 
     def save(self, **kwargs):
         try:
-            RefreshToken(self.token).blacklist()
-
+            refresh_token = RefreshToken(self.token)
+            refresh_token.blacklist()
             return {"message": "logout success"}
-
         except TokenError:
             return {"message": "bad_token"}
 
@@ -75,20 +82,10 @@ class UserInfoSerializer(serializers.ModelSerializer):
             "roles_list",
         ]
 
-    skills_list = serializers.SerializerMethodField("get_skills_list")
-    roles_list = serializers.SerializerMethodField("get_roles_list")
+    skills_list = SkillSerializer(many=True)
+    roles_list = RoleSerializer(many=True)
     profile_img = serializers.SerializerMethodField("get_profile_img")
 
     def get_profile_img(self, obj):
         profile_img = UserImage.objects.get(id=obj.user_image_id)
         return profile_img.image.url
-
-    def get_skills_list(self, obj):
-        skills_queryset = Skill.objects.filter(user=obj)
-        skills_list = [skill.name for skill in skills_queryset]
-        return skills_list
-
-    def get_roles_list(self, obj):
-        roles_queryset = Role.objects.filter(user=obj)
-        roles_list = [role.name for role in roles_queryset]
-        return roles_list

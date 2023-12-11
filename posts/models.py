@@ -2,7 +2,7 @@ from django.db import models
 from core.models import TimeStampedModel
 from skills.models import Skill
 from roles.models import Role
-from user.models import User
+from user.models import User, UserImage
 
 
 class Post(TimeStampedModel, models.Model):

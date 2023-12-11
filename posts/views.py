@@ -10,7 +10,6 @@ from posts.permissions import IsOwnerOrReadOnly
 from posts.serializers import (
     PostSerializer,
     PostDetailSerializer,
-    PopularPostSerializer,
 )
 from user.models import User
 from drf_yasg.utils import swagger_auto_schema
@@ -118,6 +117,6 @@ class PostLikeAPI(APIView):
 
 class PopularPostAPI(generics.ListAPIView):
     queryset = Post.objects.all().order_by("-score")[:4:]
-    serializer_class = PopularPostSerializer
+    serializer_class = PostDetailSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]

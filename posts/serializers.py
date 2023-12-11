@@ -1,25 +1,17 @@
 from posts.models import Post, Like
 from skills.models import Skill
+from skills.serializers import SkillSerializer
 from roles.models import Role
+from roles.serializers import RoleSerializer
+from user.serializers import UserImageSerializer
 from rest_framework import serializers
 from comments.serializers import CommentSerializer
-
-
-class SkillSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Skill
-        fields = '__all__'
-
-
-class RoleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Role
-        fields = '__all__'
 
 
 class PostSerializerBase(serializers.ModelSerializer):
     skills = SkillSerializer(many=True)
     roles = RoleSerializer(many=True)
+    author_image = UserImageSerializer(source='author.user_image', read_only=True)
     author_nickname = serializers.SerializerMethodField("get_author_nickname")
     like_count = serializers.SerializerMethodField("get_like_count")
 
@@ -36,6 +28,7 @@ class PostSerializer(PostSerializerBase):
         model = Post
         fields = [
             "id",
+            "author_image",
             "title",
             "content",
             "author_nickname",
@@ -73,24 +66,10 @@ class PostSerializer(PostSerializerBase):
         return post
 
 
-class PostDetailSerializer(PostSerializerBase):
+class PostDetailSerializer(PostSerializer):
     class Meta:
         model = Post
         fields = [
-            "id",
-            "title",
-            "content",
-            "author_nickname",
-            "schedule",
-            "deadline",
-            "roles",
-            "skills",
-            "contact",
-            "contact_url",
-            "is_private",
-            "created_at",
-            "updated_at",
-            "like_count",
             "comment_set",
             "comment_count",
             "views",
@@ -126,24 +105,3 @@ class PostDetailSerializer(PostSerializerBase):
             instance.skills.add(skill_instance)
 
         return instance
-
-class PopularPostSerializer(PostSerializer):
-    class Meta:
-        model = Post
-        fields = [
-            "id",
-            "title",
-            "content",
-            "author_nickname",
-            "schedule",
-            "deadline",
-            "roles",
-            "skills",
-            "contact",
-            "contact_url",
-            "is_private",
-            "created_at",
-            "updated_at",
-            "like_count",
-            "views",
-        ]
